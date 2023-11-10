@@ -1,0 +1,44 @@
+{{define "base"}}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/css/bootstrap.min.css">
+    <title>
+      {{block "title" .}}
+
+      {{end}}
+    </title>
+  </head>
+  <body>
+    <div class="container">
+
+      <div class="row">
+      
+        <div class="col">
+        
+          {{block "content" .}}
+
+
+          {{end}}
+        
+        </div>
+      
+      </div>
+
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/js/bootstrap.min.js"></script>
+    {{block "js" .}}
+
+    {{end}}
+  </body>
+</html>
+
+{{end}}
