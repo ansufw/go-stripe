@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/aysf/go-stripe/internal/driver"
 )
 
 const version = "1.0.0"
@@ -56,7 +58,8 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 4000, "Server port to listen on")
 	flag.StringVar(&cfg.env, "env", "development", "Application environment {development|production}")
 	flag.StringVar(&cfg.api, "api", "http://localhost:4001/api", "URL to API")
-	flag.StringVar(&cfg.db.dsn, "dsn", "postgres://{user}:{password}@{host}:{port}/{db_name}?sslmode=disable", "database connection")
+	// flag.StringVar(&cfg.db.dsn, "dsn", "ananto:secret@tcp(127.0.0.1:6033)/widgets?parseTime=true&tls=false", "(dsn) database string")
+	flag.StringVar(&cfg.db.dsn, "dsn", "root:custompwd@tcp(localhost:6033)/widgets", "(dsn) database string")
 
 	flag.Parse()
 
@@ -65,6 +68,12 @@ func main() {
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	conn, err := driver.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer conn.Close()
 
 	tc := make(map[string]*template.Template)
 
@@ -76,7 +85,7 @@ func main() {
 		version:       version,
 	}
 
-	err := app.serve()
+	err = app.serve()
 	if err != nil {
 		app.errorLog.Println(err)
 		log.Fatal(err)
