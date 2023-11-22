@@ -2,12 +2,10 @@ version: '3.8'
  
 services:
   db:
-    image: mysql
-    container_name: mysqldb
+    image: mariadb:11.1
+    container_name: mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: custompwd
-      MYSQL_DATABASE: widgets
+      MARIADB_ROOT_PASSWORD: custompwd
+      MARIADB_DATABASE: widgets
     ports:
-      - "6033:3306"
-    volumes:
-      - ./.datadb:/var/lib/mysql
+      - "3307:3306"

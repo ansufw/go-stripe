@@ -58,8 +58,7 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 4000, "Server port to listen on")
 	flag.StringVar(&cfg.env, "env", "development", "Application environment {development|production}")
 	flag.StringVar(&cfg.api, "api", "http://localhost:4001/api", "URL to API")
-	// flag.StringVar(&cfg.db.dsn, "dsn", "ananto:secret@tcp(127.0.0.1:6033)/widgets?parseTime=true&tls=false", "(dsn) database string")
-	flag.StringVar(&cfg.db.dsn, "dsn", "root:custompwd@tcp(localhost:6033)/widgets", "(dsn) database string")
+	flag.StringVar(&cfg.db.dsn, "dsn", "ananto:secret@tcp(localhost:3307)/widgets?parseTime=true&tls=false", "(dsn) database string")
 
 	flag.Parse()
 

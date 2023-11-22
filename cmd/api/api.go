@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/aysf/go-stripe/internal/driver"
 )
 
 const version = "1.0.0"
@@ -50,7 +52,7 @@ func main() {
 
 	flag.IntVar(&cfg.port, "port", 4001, "Server port to listen on")
 	flag.StringVar(&cfg.env, "env", "development", "Application environment {development|production|maintenance}")
-	flag.StringVar(&cfg.db.dsn, "dsn", "postgres://{user}:{password}@{host}:{port}/{db_name}?sslmode=disable", "database connection")
+	flag.StringVar(&cfg.db.dsn, "dsn", "ananto:secret@tcp(localhost:3307)/widgets?parseTime=true&tls=false", "(dsn) database string")
 
 	flag.Parse()
 
@@ -60,6 +62,12 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
+	conn, err := driver.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer conn.Close()
+
 	app := &application{
 		config:   cfg,
 		infoLog:  infoLog,
@@ -67,7 +75,7 @@ func main() {
 		version:  version,
 	}
 
-	err := app.serve()
+	err = app.serve()
 	if err != nil {
 		log.Fatal(err)
 	}
