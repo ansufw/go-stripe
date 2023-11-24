@@ -16,10 +16,16 @@ Sample Golang application with stripe payment
 
 ### Database setup
 
-8. build mysqldb with docker `docker-compose -p mysql -f ./docker-compose.yml up -d`
-9. connect to db using root user
-10. run query `GRANT ALL ON widgets.* TO 'ananto'@'%' IDENTIFIED BY 'secret'` or `CREATE USER 'ananto'@'%' IDENTIFIED BY 'secret'; && GRANT ALL PRIVILEGES ON widgets.* TO 'ananto'@'%';` for newest version
-11. seed database using `go run ./cmd/seed/*.go`
-12. test widget api `http://localhost:4001/api/widget/1`
+1. build mysqldb with docker `docker-compose -p mysql -f ./docker-compose.yml up -d`
+2. connect to db using root user
+3. run query `GRANT ALL ON widgets.* TO 'ananto'@'%' IDENTIFIED BY 'secret'` or `CREATE USER 'ananto'@'%' IDENTIFIED BY 'secret'; && GRANT ALL PRIVILEGES ON widgets.* TO 'ananto'@'%';` for newest version
+
+
+### Migrate Database
+- Opsi 1
+1. seed database using `go run ./cmd/seed/*.go`
+2. test widget api `http://localhost:4001/api/widget/1`
+- Opsi 2
+1. run `soda migrate`
 
 
