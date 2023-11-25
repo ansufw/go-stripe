@@ -62,7 +62,7 @@
 
 {{define "js"}}
     <script>
-        document.getElementById("charge_amount", function(e){
+        document.getElementById("charge_amount").addEventListener("change", (e)=>{
             if (e.target.value !== "") {
                 document.getElementById("amount").value = e.target.value * 100;
             } else {
