@@ -92,11 +92,92 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 
 	var widget Widget
 
-	row := m.DB.QueryRowContext(ctx, "SELECT id, name FROM widgets WHERE id = ?", id)
-	err := row.Scan(&widget.ID, &widget.Name)
+	row := m.DB.QueryRowContext(ctx, `
+	SELECT 
+		id, name, description, inventory_level, price, coalesce(image, ''),
+		created_at, updated_at
+	FROM 
+		widgets 
+	WHERE id = ?`, id)
+	err := row.Scan(
+		&widget.ID,
+		&widget.Name,
+		&widget.Description,
+		&widget.InventoryLevel,
+		&widget.Price,
+		&widget.Image,
+		&widget.CreatedAt,
+		&widget.UpdatedAt,
+	)
 	if err != nil {
 		return widget, err
 	}
 
 	return widget, nil
+}
+
+// InsertTransaction insert a new txn, and returns its id
+func (m *DBModel) InsertTransaction(txn Transaction) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		INSERT INTO transactions 
+			(amount, currency, last_four, bank_return_code,
+			transaction_status_id, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+	`
+
+	result, err := m.DB.ExecContext(ctx, stmt,
+		txn.Amount,
+		txn.Currency,
+		txn.LastFour,
+		txn.BankReturnCode,
+		txn.TransactionStatusID,
+		time.Now(),
+		time.Now(),
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}
+
+// InsertOrder insert a new order, and returns its id
+func (m *DBModel) InsertOrder(order Order) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		INSERT INTO orders 
+			(widget_id, transaction_id, status_id, quantity,
+			amount, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+	`
+
+	result, err := m.DB.ExecContext(ctx, stmt,
+		order.WidgetID,
+		order.TransactionID,
+		order.StatusID,
+		order.Quantity,
+		order.Amount,
+		time.Now(),
+		time.Now(),
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
