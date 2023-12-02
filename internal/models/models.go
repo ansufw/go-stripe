@@ -169,9 +169,9 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 
 	stmt := `
 		INSERT INTO orders 
-			(widget_id, transaction_id, status_id, quantity,
+			(widget_id, transaction_id, status_id, quantity, customer_id,
 			amount, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
 	result, err := m.DB.ExecContext(ctx, stmt,
@@ -179,6 +179,7 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 		order.TransactionID,
 		order.StatusID,
 		order.Quantity,
+		order.CustomerID,
 		order.Amount,
 		time.Now(),
 		time.Now(),
@@ -201,7 +202,7 @@ func (m *DBModel) InsertCustomer(c Customer) (int, error) {
 	defer cancel()
 
 	stmt := `
-		INSERT INTO orders 
+		INSERT INTO customers 
 			(first_name, last_name, email, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?)
 	`

@@ -120,9 +120,9 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	data["last_four"] = lastFour
 	data["expiry_month"] = expiryMonth
 	data["expiry_year"] = expiryYear
-	// data["bank_return_code"] = pi.Charges.Data[0].ID
-	// data["bank_return_code"] = pi.Invoice.Charge.Refunds.Data[0].ID
 	data["bank_return_code"] = pi.LatestCharge.ID
+	data["first_name"] = firstName
+	data["last_name"] = lastName
 
 	// should write this data to session, and then redirect user to new page
 
