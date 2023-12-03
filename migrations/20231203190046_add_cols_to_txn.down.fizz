@@ -1,0 +1,2 @@
+drop_column("orders", "payment_intent")
+drop_column("orders", "payment_method")
