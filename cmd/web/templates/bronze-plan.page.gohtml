@@ -71,3 +71,106 @@
 
     </form>
 {{end}}
+
+{{define "js"}}
+    {{$widget := index .Data "widget"}}
+
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <script>
+        let card;
+        let stripe;
+        const cardMessages = document.getElementById("card-messages");
+        const payButton = document.getElementById("pay-button");
+        const processing = document.getElementById("processing-payment");
+        
+    
+        stripe = Stripe('{{ .StripeKey }}');
+    
+        function hidePayButton() {
+            payButton.classList.add("d-none");
+            processing.classList.remove("d-none");
+        }
+
+        function showPayButton() {
+            payButton.classList.remove("d-none");
+            processing.classList.add("d-none");
+        }
+
+        function showCardError(msg) {
+            cardMessages.classList.add("alert-danger");
+            cardMessages.classList.remove("alert-success");
+            cardMessages.classList.remove("d-none");
+            cardMessages.innerText = msg;
+        }
+
+        function showCardSuccess() {
+            cardMessages.classList.remove("alert-danger");
+            cardMessages.classList.add("alert-success");
+            cardMessages.classList.remove("d-none");
+            cardMessages.innerText = "Transaction successful";
+        }
+
+        function val() {
+            let form = document.getElementById("charge_form");
+            if (form.checkValidity() === false) {
+                this.event.preventDefault();
+                this.event.stopPropagation();
+                form.classList.add("was-validated")
+                return;
+            }
+            form.classList.add("was-validate");
+            hidePayButton();
+
+            let amountToCharge = document.getElementById("amount").value;
+
+            stripe.createPaymentMethod({
+                type: 'card',
+                card: card,
+                billing_details: {
+                    email: document.getElementById("cardholder-email").value,
+                },
+            }).then(stripePaymentMethodHandler);
+
+        }
+
+        function stripePaymentMethodHandler(result) {
+            if (result.error) {
+                showCardError(result.error.message);
+            } else {
+                // create a customer and subscribe to plan
+            }
+        
+        }
+
+        (function() {
+            // create stripe & elements
+            const elements = stripe.elements();
+            const style = {
+                base: {
+                    fontSize: '16px',
+                    lineHeight: '24px'
+                }
+            };
+
+            // create card entry
+            card = elements.create('card', {
+                style: style,
+                hidePostalCode: true,
+            });
+            card.mount("#card-element");
+
+            // check for input errors
+            card.addEventListener('change', function(event) {
+                var displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.classList.remove('d-none');
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.classList.add('d-none');
+                    displayError.textContent = '';
+                }
+            });
+        })();
+    </script>
+{{end}}
