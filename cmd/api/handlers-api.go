@@ -248,3 +248,10 @@ func (app *application) SaveOrder(ordr models.Order) (int, error) {
 
 	return id, nil
 }
+
+func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) {
+	var userInput struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+}
