@@ -13,6 +13,7 @@ Sample Golang application with stripe payment
 5. open browser `http://localhost:4000/virtual-terminal` to test frontend
 6. do some test (see https://stripe.com/docs/testing)
 7. check your stripe dashboard (https://dashboard.stripe.com/test/payments)
+8. for login testing use credentials `admin@example.com` and `password` 
 
 ### Database setup
 
