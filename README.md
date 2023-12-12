@@ -34,4 +34,5 @@ Sample Golang application with stripe payment
 1. if database failure to save transaction, we should cancel the order
 2. if one of database saving process fail, we should rollback the transaction
 3. parse int amout: input 12.345 shall output 12.34
+4. input email should be lowercase
 
