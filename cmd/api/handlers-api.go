@@ -288,6 +288,8 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// save to database
+
 	// send response
 
 	var payload struct {
