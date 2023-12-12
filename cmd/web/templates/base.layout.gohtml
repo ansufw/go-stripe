@@ -90,6 +90,34 @@
         location.href = "/login"
       }
 
+      function checkAuth() {
+        if (localStorage.getItem("token") === null) {
+          location.href = "/login"
+          return
+        } else {
+          let token = localStorage.getItem("token");
+          const myHeaders = new Headers();
+          myHeaders.append("Content-Type", "application/json");
+          myHeaders.append("Authorization", "Bearer " + token);
+
+          const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+          }
+
+          fetch("{{.API}}/is-authenticated", requestOptions)
+          .then(response => response.json())
+          .then(function(data){
+            if (data.error === true) {
+              console.log("not logged in");
+            } else {
+              console.log("logged in");
+            }
+          })
+
+        }
+      }
+
     </script>
     {{block "js" .}}
 
