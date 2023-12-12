@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `tokens` (
-  `id` INT(11) PRIMARY KEY NOT NULL,   
+  `id` INT(11) PRIMARY KEY AUTO_INCREMENT,   
   `user_id` INT(11) UNSIGNED,       
   `name` VARCHAR(255)  NOT NULL default '',     
   `email`  VARCHAR(255) NOT NULL,
