@@ -46,7 +46,7 @@ func (app *application) SendMail(from, to, subject, tmpl string, data interface{
 
 	plainMessages := tpl.String()
 
-	app.infoLog.Printf("formattedMessage: %s\nplainMessage: %s\n", formattedMessage, plainMessages)
+	// app.infoLog.Printf("formattedMessage: %s\nplainMessage: %s\n", formattedMessage, plainMessages)
 
 	// send the email
 	server := mail.NewSMTPClient()
