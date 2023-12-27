@@ -5,7 +5,6 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
 	"io"
 )
 
@@ -51,5 +50,5 @@ func (e *Encryption) Decrypt(cryptoText string) (string, error) {
 	stream := cipher.NewCFBDecrypter(block, iv)
 	stream.XORKeyStream(cipherText, cipherText)
 
-	return fmt.Sprintf("%s", cipherText), nil
+	return string(cipherText), nil
 }

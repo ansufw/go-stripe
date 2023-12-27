@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/aysf/go-stripe/internal/cards"
+	"github.com/aysf/go-stripe/internal/encryption"
 	"github.com/aysf/go-stripe/internal/models"
 	"github.com/aysf/go-stripe/internal/urlsigner"
 	"github.com/go-chi/chi/v5"
@@ -391,8 +392,18 @@ func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	encryptor := encryption.Encryption{
+		Key: []byte(app.config.secretkey),
+	}
+
+	encryptedEmail, err := encryptor.Encrypt(r.URL.Query().Get("email"))
+	if err != nil {
+		app.errorLog.Println("encryption failed")
+		return
+	}
+
 	data := make(map[string]interface{})
-	data["email"] = r.URL.Query().Get("email")
+	data["email"] = encryptedEmail
 
 	if err := app.renderTemplate(w, r, "reset-password", &templateData{
 		Data: data,
