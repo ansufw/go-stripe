@@ -47,13 +47,39 @@
               </ul>
             </li>
 
+
+          {{if eq .IsAuthenticated 1}}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Admin
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="nav-link" href="/admin/virtual-terminal">Virtual Terminal</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/admin/all-sales">All Sales</a></li>
+                <li><a class="dropdown-item" href="/admin/all-subscriptions">All subscriptions</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+              </ul>
+            </li>
+          {{end}}
+
+
           </ul>
 
+          {{if eq .IsAuthenticated 1}}
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li id="login-link" class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          </ul>
+          {{else}}
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <li id="login-link" class="nav-item d-none">
               <a class="nav-link" href="/login">Login</a>
             </li>
           </ul>
+          {{end}}
 
         </div>
       </div>
@@ -75,6 +101,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/js/bootstrap.min.js"></script>
 
     <script>
+
+    /*
+
+
       let loginLink = document.getElementById("login-link");
       let vtLink = document.getElementById("vt-link");
 
@@ -87,6 +117,10 @@
         }
         loginLink.classList.remove("d-none");
       })
+
+      */
+
+
 
       function logout() {
         localStorage.removeItem("token");

@@ -42,6 +42,12 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 	td.StripeKey = app.config.stripe.key
 	td.API = app.config.api
 
+	if app.Session.Exists(r.Context(), "userID") {
+		td.IsAuthenticated = 1
+	} else {
+		td.IsAuthenticated = 0
+	}
+
 	return td
 }
 
