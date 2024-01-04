@@ -424,3 +424,9 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 		app.errorLog.Println(err.Error())
 	}
 }
+
+func (app *application) ShowSale(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "sale", &templateData{}); err != nil {
+		app.errorLog.Println(err.Error())
+	}
+}
