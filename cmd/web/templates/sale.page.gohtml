@@ -19,35 +19,47 @@
     <hr>
 
     <a href='{{index .StringMap "cancel"}}'  class="btn btn-info">Cancel</a>
-    <a href="H!" class="btn btn-warning">Refund Order</a>
+    <a href="#!" class="btn btn-warning" id="refund-btn">Refund Order</a>
+
+    <input type="hidden" id="pi" value="">
+    <input type="hidden" id="charge-amount" value="">
+    <input type="hidden" id="currency" value="">
 {{end}}
 
 {{define "js"}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let token = localStorage.getItem("token");
         let id = window.location.pathname.split("/").pop();
 
-        const requestOptions = {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-            },
-        };
+        document.addEventListener("DOMContentLoaded", function() {
 
-        fetch("{{.API}}/admin/get-sale/" + id, requestOptions)
-        .then(response => response.json())
-        .then(function(data) {
-          console.log(data);
+                const requestOptions = {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                    },
+                };
 
-          if (data) {
-            document.getElementById("order-no").innerHTML = data.id;
-            document.getElementById("customer").innerHTML = data.customer.first_name + " " + data.customer.last_name;
-            document.getElementById("product").innerHTML = data.widget.name;
-            document.getElementById("quantity").innerHTML = data.quantity;
-            document.getElementById("amount").innerHTML = formatCurrency(data.transaction.amount);
-          }
+                fetch("{{.API}}/admin/get-sale/" + id, requestOptions)
+                .then(response => response.json())
+                .then(function(data) {
+                console.log(data);
+                    if (data) {
+                        document.getElementById("order-no").innerHTML = data.id;
+                        document.getElementById("customer").innerHTML = data.customer.first_name + " " + data.customer.last_name;
+                        document.getElementById("product").innerHTML = data.widget.name;
+                        document.getElementById("quantity").innerHTML = data.quantity;
+                        document.getElementById("amount").innerHTML = formatCurrency(data.transaction.amount);
+                        document.getElementById("pi").value = data.transaction.payment_intent;
+                        document.getElementById("charge-amount").value = data.transaction.amount;
+                        document.getElementById("currency").value = data.transaction.currency;
+                    }
+
+                })
+        
         })
 
         function formatCurrency(amount) {
@@ -57,5 +69,42 @@
                 currency: "EUR",
             })
         }
+
+        document.getElementById("refund-btn").addEventListener("click", function() {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to undo this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Refund"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let payload = {
+                        pi: document.getElementById("pi").value,
+                        currency: document.getElementById("currency").value,
+                        amount: parseInt(document.getElementById("charge-amount").value, 10),
+                        id: parseInt(id, 10),
+                    }
+
+                    const requestOptions = {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token,
+                        },
+                        body: JSON.stringify(payload),
+                    }
+
+                    fetch("{{.API}}/admin/refund", requestOptions)
+                    .then(response => response.json())
+                    .then(function(data) {
+                        console.log(data);
+                    })
+                }
+            });
+        })
     </script>
 {{end}}
