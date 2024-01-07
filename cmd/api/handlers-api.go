@@ -592,6 +592,14 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// update status in database
+
+	err = app.DB.UpdateOrderStatus(chargeToRefund.ID, 2)
+	if err != nil {
+		app.badRequest(w, r, errors.New("the charge was refunded, but the database could not be updated: "+err.Error()))
+		return
+	}
+
 	var resp struct {
 		Error   bool   `json:"error"`
 		Message string `json:"message"`
