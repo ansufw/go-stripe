@@ -6,8 +6,8 @@
 
 {{define "content"}}
     <h2 class="mt-5">{{index .StringMap "title"}}</h2>
-        <span class="badge bg-danger d-none" id="refunded">Refunded</span>
-        <span class="badge bg-success d-none" id="charged">Charged</span>
+        <span class="badge bg-danger d-none" id="refunded">{{index .StringMap "refunded-badge"}}</span>
+        <span class="badge bg-success d-none" id="charged">{{index .StringMap "charged-badge"}}</span>
 
     <hr>
 
@@ -24,7 +24,7 @@
     <hr>
 
     <a href='{{index .StringMap "cancel"}}'  class="btn btn-info">Cancel</a>
-    <a href="#!" class="btn btn-warning" id="refund-btn">Refund Order</a>
+    <a href="#!" class="btn btn-warning" id="refund-btn">{{index .StringMap "refund-btn"}}</a>
 
     <input type="hidden" id="pi" value="">
     <input type="hidden" id="charge-amount" value="">
@@ -104,7 +104,7 @@
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "Refund"
+                confirmButtonText: '{{index .StringMap "refund-btn"}}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     let payload = {
@@ -124,13 +124,13 @@
                         body: JSON.stringify(payload),
                     }
 
-                    fetch("{{.API}}/admin/refund", requestOptions)
+                    fetch("{{.API}}{{index .StringMap "refund-url"}}", requestOptions)
                     .then(response => response.json())
                     .then(function(data) {
                         if (data.error) {
                             showError(data.message);
                         } else {
-                            showSuccess("charge refunded");
+                            showSuccess("{{index .StringMap "refunded-msg"}}");
                             document.getElementById("refund-btn").classList.add("d-none");
                         }
                     })
