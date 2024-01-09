@@ -400,7 +400,7 @@ func (m *DBModel) GetAllOrdersPaginated(pageSize, currentPage int) ([]*Order, in
 
 	rows, err := m.DB.QueryContext(ctx, query, pageSize, offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, 0, err
 	}
 
 	defer rows.Close()
@@ -441,7 +441,7 @@ func (m *DBModel) GetAllOrdersPaginated(pageSize, currentPage int) ([]*Order, in
 	query = `
 		SELECT COUNT(o.id)
 			FROM orders o
-			LEFT JOIN widgets w ON (o.widget = w.id)
+			LEFT JOIN widgets w ON (o.widget_id = w.id)
 		WHERE
 			w.is_recurring = 0
 	`

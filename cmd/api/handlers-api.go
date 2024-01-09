@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -532,13 +533,40 @@ func (app *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 // AllSales renders the all sales page
 func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
-	allSales, err := app.DB.GetAllOrders()
+	var payload struct {
+		PageSize    int `json:"page_size"`
+		CurrentPage int `json:"current_page"`
+	}
+
+	err := app.readJSON(w, r, &payload)
 	if err != nil {
+		log.Println("error 1", err)
+		app.badRequest(w, r, errors.New("error read data from all_sales endpoint: "+err.Error()))
+		return
+	}
+
+	allSales, lastPage, totalRecords, err := app.DB.GetAllOrdersPaginated(2, 1)
+	if err != nil {
+		app.errorLog.Println("error get all orders", err)
 		app.badRequest(w, r, err)
 		return
 	}
 
-	app.writeJSON(w, http.StatusOK, allSales)
+	var resp struct {
+		CurrentPage  int             `json:"current_page"`
+		PageSize     int             `json:"page_size"`
+		LastPage     int             `json:"last_page"`
+		TotalRecords int             `json:"total_records"`
+		Orders       []*models.Order `json:"orders"`
+	}
+
+	resp.CurrentPage = 1
+	resp.PageSize = payload.PageSize
+	resp.LastPage = lastPage
+	resp.TotalRecords = totalRecords
+	resp.Orders = allSales
+
+	app.writeJSON(w, http.StatusOK, resp)
 }
 
 // AllSubscriptions renders the all subscriptions page
