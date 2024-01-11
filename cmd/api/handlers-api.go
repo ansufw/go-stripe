@@ -581,6 +581,13 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 		app.badRequest(w, r, errors.New("error read data from all_subscriptions endpoint: "+err.Error()))
 		return
 	}
+
+	allSales, lastPage, totalRecords, err := app.DB.GetAllSubscriptionsPaginated(payload.PageSize, payload.CurrentPage)
+	if err != nil {
+		app.errorLog.Println("error get all orders", err)
+		app.badRequest(w, r, err)
+		return
+	}
 	if err != nil {
 		app.errorLog.Println("error get all subscriptions:", err)
 		app.badRequest(w, r, err)
