@@ -52,8 +52,9 @@
             pageButtons[j].addEventListener("click", function(evt) {
                 let desiredPage = evt.target.getAttribute("data-page");
                 console.log("clicked, and data-page is", desiredPage);
-                if ((desiredPage > 0) && (desiredPage <= pages)) {
+                if ((desiredPage > 0) && (desiredPage <= pages + 1)) {
                     console.log("would go to page", desiredPage);
+                    updateTable(pageSize, desiredPage);
                 }
             })
         }
@@ -63,10 +64,11 @@
     function updateTable(ps, cp) {
         let token = localStorage.getItem("token");
         let tbody = document.getElementById("sales-table").getElementsByTagName("tbody")[0];
+        tbody.innerHTML = "";
 
         let body = {
-            page_size: ps,
-            current_page: cp,
+            page_size: parseInt(ps, 10),
+            current_page: parseInt(cp,10),
         }
 
         const requestOptions = {
@@ -115,7 +117,7 @@
             } else {
                 let newRow = tbody.insertRow();
                 let newCell = newRow.insertCell();
-                newCell.setAttribute("colspan", "4");
+                newCell.setAttribute("colspan", "5");
                 newCell.innerHTML = "No data available";
             }
         })

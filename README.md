@@ -37,6 +37,12 @@ Sample Golang application with stripe payment
 2. if one of database saving process fail, we should rollback the transaction
 3. parse int amout: input 12.345 shall output 12.34
 4. input email should be lowercase
+5. Error 
+```js
+Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'addEventListener')
+    at paginator (all-sales:177:28)
+    at all-sales:241:17
+```
 
 ### Ref
 1. https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
