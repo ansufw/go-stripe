@@ -523,6 +523,90 @@ func (m *DBModel) GetAllSubscriptions() ([]*Order, error) {
 	return orders, nil
 }
 
+func (m *DBModel) GetAllSubscriptionsPaginated(pageSize, currentPage int) ([]*Order, int, int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var orders []*Order
+
+	offset := (currentPage - 1) * pageSize
+
+	query := `SELECT
+		o.id, o.widget_id, o.transaction_id, o.customer_id,
+		o.status_id, o.quantity, o.amount, o.created_at, 
+		o.updated_at, w.id, w.name, t.id, t.amount, t.currency,
+		t.last_four, t.expiry_month, t.expiry_year, t.payment_intent,
+		t.bank_return_code, c.id, c.first_name, c.last_name, c.email 
+	FROM
+		orders o
+		LEFT JOIN widgets w ON (o.widget_id = w.id)
+		LEFT JOIN transactions t ON (o.transaction_id = t.id)
+		LEFT JOIN customers c ON (o.customer_id = c.id)
+	WHERE 
+		w.is_recurring = 1
+	LIMIT ? 
+	OFFSET ?`
+
+	rows, err := m.DB.QueryContext(ctx, query, pageSize, offset)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var o Order
+		err = rows.Scan(
+			&o.ID,
+			&o.WidgetID,
+			&o.TransactionID,
+			&o.CustomerID,
+			&o.StatusID,
+			&o.Quantity,
+			&o.Amount,
+			&o.CreatedAt,
+			&o.UpdatedAt,
+			&o.Widget.ID,
+			&o.Widget.Name,
+			&o.Transaction.ID,
+			&o.Transaction.Amount,
+			&o.Transaction.Currency,
+			&o.Transaction.LastFour,
+			&o.Transaction.ExpiryMonth,
+			&o.Transaction.ExpiryYear,
+			&o.Transaction.PaymentIntent,
+			&o.Transaction.BankReturnCode,
+			&o.Customer.ID,
+			&o.Customer.FirstName,
+			&o.Customer.LastName,
+			&o.Customer.Email,
+		)
+		if err != nil {
+			return nil, 0, 0, err
+		}
+		orders = append(orders, &o)
+	}
+
+	query = `
+		SELECT COUNT(o.id)
+			FROM orders o
+			LEFT JOIN widgets w ON (o.widget_id = w.id)
+		WHERE
+			w.is_recurring = 1
+	`
+
+	var totalRecords int
+	countRow := m.DB.QueryRowContext(ctx, query)
+	err = countRow.Scan(&totalRecords)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	lastPage := totalRecords / pageSize
+
+	return orders, lastPage, totalRecords, nil
+}
+
 func (m *DBModel) GetOrderByID(id int) (Order, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

@@ -13,6 +13,7 @@
                 <th>Costumer</th>
                 <th>Product</th>
                 <th>Amount</th>
+                <th>Status</th>
             </tr>
         </thead>
 
@@ -20,12 +21,55 @@
 
         </tbody>
     </table>
+
+    <nav>
+        <ul id="paginator" class="pagination">
+        
+        </ul>
+    </nav>
 {{end}}
 
 {{define "js"}}
     <script>
+        let currentPage = 1;
+        let pageSize = 3;
+
+    function paginator(pages, curPage) {
+        let p = document.getElementById("paginator");
+
+        let html = `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage - 1}">&lt;</a></li>`;
+
+        for (let i = 0; i <= pages; i++) {
+            html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${i + 1}">${i + 1}</a></li>`;
+        }
+
+        html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage + 1}">&gt;</a></li>`;
+
+        p.innerHTML = html;
+
+        let pageButtons = document.getElementsByClassName("pager");
+        for (let j = 0; j <= pageButtons.length; j++) {
+            pageButtons[j].addEventListener("click", function(evt) {
+                let desiredPage = evt.target.getAttribute("data-page");
+                console.log("clicked, and data-page is", desiredPage);
+                if ((desiredPage > 0) && (desiredPage <= pages + 1)) {
+                    console.log("would go to page", desiredPage);
+                    updateTable(pageSize, desiredPage);
+                }
+            })
+        }
+
+    }
+
+    function updateTable(ps, cp) {
         let token = localStorage.getItem("token");
         let tbody = document.getElementById('sales-table').getElementsByTagName('tbody')[0];
+        tbody.innerHTML = "";
+
+        let body = {
+            page_size: parseInt(ps, 10),
+            current_page: parseInt(cp,10),
+        }
 
         const requestOptions = {
             method: 'post',
@@ -34,13 +78,13 @@
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token,
             },
+            body: JSON.stringify(body),
         };
-
         fetch("{{.API}}/admin/all-subscriptions", requestOptions)
         .then(response => response.json())
         .then(function(data) {
-            if (data) {
-                data.forEach(function(i) {
+            if (data.orders) {
+                data.orders.forEach(function(i) {
                     let newRow = tbody.insertRow();
 
                     let newCell = newRow.insertCell();
@@ -65,23 +109,28 @@
                     } else {
                         newCell.innerHTML = `<span class="badge bg-success">Active</span>`;
                     }
-
                 })
+                paginator(data.last_page, data.current_page);
             } else {
                 let newRow = tbody.insertRow();
                 let newCell = newRow.insertCell();
-                newCell.setAttribute("colspan", "4");
+                newCell.setAttribute("colspan", "5");
                 newCell.innerHTML = "No data available";
             }
         })
+    }
 
-        function formatCurrency(amount) {
-            let c = parseFloat(amount/100);
-            return c.toLocaleString("en-CA", {
-                style: "currency",
-                currency: "EUR",
-            })
-        }
+    document.addEventListener("DOMContentLoaded", function() {
+        updateTable(pageSize, currentPage)
+    })
+
+    function formatCurrency(amount) {
+        let c = parseFloat(amount/100);
+        return c.toLocaleString("en-CA", {
+            style: "currency",
+            currency: "EUR",
+        })
+    }
     </script>
 
 {{end}}
