@@ -799,7 +799,12 @@ func (m *DBModel) DeleteUser(id int) error {
 	defer cancel()
 
 	stmt := `DELETE FROM users WHERE id = ?`
-
 	_, err := m.DB.ExecContext(ctx, stmt, id)
+	if err != nil {
+		return err
+	}
+
+	stmt = `DELETE FROM tokens WHERE user_id = ?`
+	_, err = m.DB.ExecContext(ctx, stmt, id)
 	return err
 }
