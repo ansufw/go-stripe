@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -37,6 +38,9 @@ var clients = make(map[WebSocketConnection]string)
 var wsChan = make(chan WsPayload)
 
 func (app *application) WsEndPoint(w http.ResponseWriter, r *http.Request) {
+
+	log.Println("delme hit wsEndPoint")
+
 	wsUpgrade := w
 	if upgrade, ok := w.(interface{ Unwrap() http.ResponseWriter }); ok {
 		wsUpgrade = upgrade.Unwrap()
@@ -47,7 +51,7 @@ func (app *application) WsEndPoint(w http.ResponseWriter, r *http.Request) {
 		app.errorLog.Println(err)
 		return
 	}
-	defer ws.Close()
+	// defer ws.Close()
 
 	app.infoLog.Printf("client connected from %s", r.RemoteAddr)
 	var response WsJsonResponse
