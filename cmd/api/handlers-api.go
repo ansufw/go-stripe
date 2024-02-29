@@ -584,11 +584,6 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 
 	allSales, lastPage, totalRecords, err := app.DB.GetAllSubscriptionsPaginated(payload.PageSize, payload.CurrentPage)
 	if err != nil {
-		app.errorLog.Println("error get all orders", err)
-		app.badRequest(w, r, err)
-		return
-	}
-	if err != nil {
 		app.errorLog.Println("error get all subscriptions:", err)
 		app.badRequest(w, r, err)
 		return

@@ -50,6 +50,8 @@ func main() {
 		version:  version,
 	}
 
+	app.CreateDirIfNotExist("./invoice")
+
 	err := app.serve()
 	if err != nil {
 		log.Fatal(err)

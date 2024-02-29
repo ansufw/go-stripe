@@ -4,7 +4,12 @@ go 1.20
 
 require golang.org/x/crypto v0.16.0
 
-require golang.org/x/net v0.17.0 // indirect
+require (
+	github.com/phpdave11/gofpdf v1.4.2 // indirect
+	github.com/phpdave11/gofpdi v1.0.12 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/net v0.17.0 // indirect
+)
 
 require (
 	github.com/alexedwards/scs/mysqlstore v0.0.0-20231113091146-cef4b05350c8 // indirect
