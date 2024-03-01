@@ -38,6 +38,7 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// --> for testing purpose
 	// order.ID = 100
 	// order.Email = "me@here.com"
 	// order.FirstName = "John"
@@ -48,15 +49,23 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 	// order.CreatedAt = time.Now()
 
 	// generate a pdf invoice
-	err := app.createInvoicePDF(order)
+	err = app.createInvoicePDF(order)
 	if err != nil {
 		app.badRequest(w, r, err)
 		return
 	}
 
 	// create mail
+	attachments := []string{
+		fmt.Sprintf("./invoices/%d.pdf", order.ID),
+	}
 
 	// send mail with attachement
+	err = app.SendMail("info@widget.com", order.Email, "Your Invoice", "invoice", attachments, nil)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
 
 	// send response
 	var resp struct {
@@ -101,7 +110,7 @@ func (app *application) createInvoicePDF(order Order) error {
 	pdf.SetX(185)
 	pdf.CellFormat(20, 8, fmt.Sprintf("$%.2f", float32(order.Amount/100.0)), "", 0, "R", false, 0, "")
 
-	invoicePath := fmt.Sprintf("./invoice/%d.pdf", order.ID)
+	invoicePath := fmt.Sprintf("./invoices/%d.pdf", order.ID)
 	err := pdf.OutputFileAndClose(invoicePath)
 	if err != nil {
 		return err
