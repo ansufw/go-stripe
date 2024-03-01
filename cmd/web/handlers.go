@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -105,6 +107,18 @@ func (app *application) GetTransactionData(r *http.Request) (TransactionData, er
 
 }
 
+type Invoice struct {
+	ID        int       `json:"id"`
+	Quantity  int       `json:"quantity"`
+	Amount    int       `json:"amount"`
+	Product   string    `json:"product"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	// Items     []Products
+}
+
 // PaymentSucceeded displays the receipt page
 func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
@@ -160,7 +174,25 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 		UpdatedAt:     time.Now(),
 	}
 
-	_, err = app.SaveOrder(order)
+	orderID, err := app.SaveOrder(order)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	// call invoice microservice
+	inv := Invoice{
+		ID:        orderID,
+		Amount:    order.Amount,
+		Product:   "Widget",
+		Quantity:  order.Quantity,
+		FirstName: txnData.FirstName,
+		LastName:  txnData.LastName,
+		Email:     txnData.Email,
+		CreatedAt: time.Now(),
+	}
+
+	err = app.callInvoiceMicro(inv)
 	if err != nil {
 		app.errorLog.Println(err)
 		return
@@ -175,6 +207,30 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	// }); err != nil {
 	// 	app.errorLog.Println(err)
 	// }
+}
+
+func (app *application) callInvoiceMicro(inv Invoice) error {
+	url := "http://localhost:4005/invoice/create-and-send"
+	out, err := json.MarshalIndent(inv, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(out))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	app.infoLog.Println(resp.Body)
+	return nil
 }
 
 // VirtualTerminalPaymentSucceeded displays the receipt page for virtual terminal transaction
