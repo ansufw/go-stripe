@@ -61,7 +61,7 @@ func main() {
 
 	flag.IntVar(&cfg.port, "port", 4001, "Server port to listen on")
 	flag.StringVar(&cfg.env, "env", "development", "Application environment {development|production|maintenance}")
-	flag.StringVar(&cfg.db.dsn, "dsn", "ananto:secret@tcp(localhost:3307)/widgets?parseTime=true&tls=false", "(dsn) database string")
+	flag.StringVar(&cfg.db.dsn, "dsn", "ananto:secret@tcp(localhost:3306)/widgets?parseTime=true&tls=false", "(dsn) database string")
 	flag.StringVar(&cfg.smtp.host, "smtphost", "smtp.mailtrap.io", "smtp host")
 	flag.StringVar(&cfg.smtp.username, "username", "92555e84bca154", "smtp username")
 	flag.StringVar(&cfg.smtp.password, "password", "c3666fa8e8feae", "smtp password")

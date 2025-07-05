@@ -1,11 +1,38 @@
+# Use version 3.8 of Docker Compose for modern features
 version: '3.8'
  
 services:
+  # Define the database service
   db:
     image: mariadb:11.1
     container_name: mariadb
+    # Always restart the container if it stops.
+    # Useful for production environments.
+    restart: always
     environment:
+      # Sets the root password for the database.
+      # Important: Change 'custompwd' to a strong, secret password.
       MARIADB_ROOT_PASSWORD: custompwd
+      
+      # Creates a database named 'widgets'.
       MARIADB_DATABASE: widgets
+      
+      # Creates a new user named 'ananto'.
+      # The MariaDB entrypoint script will automatically grant this user
+      # full privileges on the database specified in MARIADB_DATABASE.
+      MARIADB_USER: ananto
+      
+      # Sets the password for the new user 'ananto'.
+      # Important: Change 'secret' to a strong, secret password.
+      MARIADB_PASSWORD: secret
     ports:
-      - "3307:3306"
+      # Maps port 3306 on the host to port 3306 in the container.
+      - "3306:3306"
+    volumes:
+      # Mounts a named volume to persist the database data.
+      # This ensures your data is not lost when the container is stopped or removed.
+      - mariadb_data:/var/lib/mysql
+
+# Define the named volume for data persistence
+volumes:
+  mariadb_data:
