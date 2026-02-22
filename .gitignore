@@ -1,3 +1,4 @@
 Makefile
 .datadb
 .DS_Store
+dist/*
