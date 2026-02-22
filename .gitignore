@@ -2,3 +2,4 @@ Makefile
 .datadb
 .DS_Store
 dist/*
+!dist/.gitkeep
